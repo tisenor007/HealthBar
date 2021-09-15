@@ -7,16 +7,18 @@ public class PlayerHealthSystem : MonoBehaviour
     public float healthChangeAmount;
     public GameObject HealthBar;
     public float pHealth;
-    public GameObject healStation;
-    public GameObject damageStation;
+
     public int timeBetweenHealthChanges;
     private float maxHealth;
     private int maxTime;
+
+    private bool playerIsTakingDamage = false;
+    private bool playerIsHealing = false;
     // Start is called before the first frame update
     void Start()
     {
         maxHealth = pHealth;
-        timeBetweenHealthChanges = timeBetweenHealthChanges * 60;
+        timeBetweenHealthChanges = timeBetweenHealthChanges * 600;
         maxTime = timeBetweenHealthChanges;
     }
 
@@ -27,6 +29,28 @@ public class PlayerHealthSystem : MonoBehaviour
  
         timeBetweenHealthChanges--;
         Debug.Log(timeBetweenHealthChanges);
+
+        if (pHealth <= 0)
+        {
+            this.gameObject.SetActive(false);
+        }
+
+        if (playerIsHealing == true)
+        {
+            if (timeBetweenHealthChanges <= 0)
+            {
+                AddHealth();
+                timeBetweenHealthChanges = maxTime;
+            }
+        }
+        if (playerIsTakingDamage == true)
+        {
+            if (timeBetweenHealthChanges <= 0)
+            {
+                RemoveHealth();
+                timeBetweenHealthChanges = maxTime;
+            }
+        }
     }
 
     public void AddHealth()
@@ -48,22 +72,31 @@ public class PlayerHealthSystem : MonoBehaviour
     }
     public void OnTriggerEnter(Collider other)
     {
-       
-        if (timeBetweenHealthChanges <= 0)
+        if (other.gameObject.tag == "HealStation")
         {
-            if (other.gameObject.tag == "HealStation")
-            {
-                AddHealth();
-                Debug.Log("aaahh");
-                timeBetweenHealthChanges = maxTime;
-            }
-            if (other.gameObject.tag == "DamageStation")
-            {
-                RemoveHealth();
-                Debug.Log("hhaaa");
-                timeBetweenHealthChanges = maxTime;
-            }
-
+            playerIsHealing = true;
+        }
+        if (other.gameObject.tag == "DamageStation")
+        {
+            playerIsTakingDamage = true;
+        }
+    }
+    public void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "HealStation")
+        {
+            playerIsHealing = false;
+        }
+        if (other.gameObject.tag == "DamageStation")
+        {
+            playerIsTakingDamage = false;
+        }
+    }
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.tag == "Enemy")
+        {
+            RemoveHealth();
         }
     }
 
