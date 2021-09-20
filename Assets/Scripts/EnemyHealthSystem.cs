@@ -8,7 +8,7 @@ public class EnemyHealthSystem : MonoBehaviour
     public float healthChangeAmount;
     public GameObject HealthBar;
     public GameObject Canvas;
-    public GameObject Camera;
+    public Transform Camera;
     private float maxHealth;
     // Start is called before the first frame update
     void Start()
@@ -19,7 +19,7 @@ public class EnemyHealthSystem : MonoBehaviour
     void Update()
     {
         HealthBar.transform.localScale = new Vector3(eHealth / maxHealth, 1, 1);
-        Canvas.transform.LookAt(Camera.transform);
+        Canvas.transform.LookAt(Canvas.transform.position + Camera.forward);
 
         if (eHealth <=0)
         {
